@@ -219,9 +219,6 @@ abstract public class Resource {
                 } else {
                     result = m.method.invoke( this );
                 }
-                if ( role(HttpServletRequest.class).getHeader("Accept").contains(MediaType.TEXT_HTML) ) {
-                    return result.toString();
-                }
                 return result;
             } catch ( IllegalAccessException e) {
                 throw new WebApplicationException( e, Response.Status.INTERNAL_SERVER_ERROR );
