@@ -58,18 +58,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.powermock.modules</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
-            <version>1.4.5</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock.api</groupId>
-            <artifactId>powermock-api-mockito</artifactId>
-            <version>1.4.5</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>1.4</version>
