@@ -29,10 +29,6 @@ public class RootResource extends Resource {
         return new OtherResource();
     }
 
-    public void wrong( String input ) {
-
-    }
-
     public void wrong2( StringDTO one, StringDTO two ) {
         
     }

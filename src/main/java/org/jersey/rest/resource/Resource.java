@@ -6,7 +6,6 @@ import com.sun.xml.internal.bind.v2.runtime.JAXBContextImpl;
 import org.jersey.rest.RestfulJerseyService;
 import org.jersey.rest.constraint.Constraint;
 import org.jersey.rest.constraint.ConstraintEvaluator;
-import org.jersey.rest.dto.BaseDTO;
 import org.jersey.rest.dto.StringDTO;
 
 import javax.servlet.http.HttpServletRequest;
@@ -239,12 +238,17 @@ abstract public class Resource {
                 if ( Modifier.isFinal( f.getModifiers() ) ) continue;
                 f.setAccessible(true);
                 String value = formParams.getFirst(prefix + "." + f.getName());
+
                 if ( f.getType() == String.class ) {
                     f.set( o, value );
-                } else if ( f.getType().isEnum() ) {
-                    f.set( o, Enum.valueOf((Class<Enum>) f.getType(), value));
                 } else if ( f.getType() == Integer.class ) {
                     f.set( o, Integer.valueOf( value ) );
+                } else if ( f.getType() == Double.class ) {
+                    f.set( o, Double.valueOf( value ) );
+                } else if ( f.getType() == Boolean.class ) {
+                    f.set( o, Boolean.valueOf( value ) );
+                } else if ( f.getType().isEnum() ) {
+                    f.set( o, Enum.valueOf((Class<Enum>) f.getType(), value));f.set( o, Enum.valueOf((Class<Enum>) f.getType(), value));
                 } else {
                     Object innerDto = populateDTO( f.getType(), formParams, prefix + "." +f.getName() );
                     f.set( o, innerDto );
@@ -277,11 +281,7 @@ abstract public class Resource {
         }
 
         private boolean argumentCheck( Class<?>[] parameterTypes ) {
-            if ( parameterTypes.length > 1 ) return false;
-            if ( parameterTypes.length == 1 ) {
-                return BaseDTO.class.isAssignableFrom( parameterTypes[0] );
-            }
-            return true;
+            return parameterTypes.length <= 1;
         }
 
         private void handleReturnType( Class<?> returnType ) {
@@ -290,7 +290,7 @@ abstract public class Resource {
             } else if ( Resource.class.isAssignableFrom( returnType ) ) {
                 if ( method.getParameterTypes().length == 0 ) type = MethodType.SUBRESOURCE;
                 else type = MethodType.ILLEGAL;
-            } else if ( BaseDTO.class.isAssignableFrom( returnType )){
+            } else {
                 type = MethodType.QUERY;
                 if ( name.equals( "index" ) ){
                     isIndex = true;

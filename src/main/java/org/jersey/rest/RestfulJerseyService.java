@@ -9,8 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Extend this class to define your rest
@@ -34,6 +33,18 @@ public abstract class RestfulJerseyService {
     @Context private UriInfo uriInfo;
     @Context private HttpServletResponse response;
     @Context private HttpServletRequest request;
+
+
+    public static Set<Class> basicTypes;
+
+    static {
+        basicTypes = new HashSet<Class>();
+        basicTypes.add( String.class);
+        basicTypes.add( Integer.class);
+        basicTypes.add( Double.class );
+        basicTypes.add( Boolean.class );
+    }
+
 
 
     public void setup() {

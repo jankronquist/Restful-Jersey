@@ -5,7 +5,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  */
 @XmlRootElement( name = "integerholder" )
-public class IntegerDTO implements BaseDTO {
+public class IntegerDTO {
 
     private Integer integer;
 

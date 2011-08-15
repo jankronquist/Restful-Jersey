@@ -60,10 +60,9 @@ public class CapabilitiesTest extends AbstractRunner {
         hasMethod(result, "other:SUBRESOURCE" );
         hasMethod(result, "addten:QUERY");
         hasMethod(result, "echo:QUERY");
-        hasMethod(result, "wrong:ILLEGAL");
         hasMethod(result, "wrong2:ILLEGAL");
 
-        Assert.assertEquals( "Must have 7 ResourceMethods", 7, list.size() );
+        Assert.assertEquals( "Must have 6 ResourceMethods", 6, list.size() );
     }
 
     private void hasMethod( String result, String name ) {

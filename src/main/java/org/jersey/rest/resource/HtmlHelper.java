@@ -1,5 +1,7 @@
 package org.jersey.rest.resource;
 
+import org.jersey.rest.RestfulJerseyService;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -65,7 +67,7 @@ public class HtmlHelper {
             String name = f.getName();
             Class<?> type = f.getType();
             // this must be one of the getters
-            if ( type == String.class || type == Integer.class ) {
+            if (RestfulJerseyService.basicTypes.contains(  type ) ) {
                 sb.append(name).append(": <input type='").
                         append( name.equals("password")? "password": "text" ).
                         append("' name='").append( fieldPath ).append( "." ).append( name).append("'/></br>");
@@ -74,7 +76,7 @@ public class HtmlHelper {
                 for ( Object o : type.getEnumConstants() ) {
                     sb.append( "<option value='").append(o).append("'>").append(o).append("</option>");
                 }
-                sb.append( "</select></br>");
+                sb.append("</select></br>");
             } else {
                 // for now assume DTO subtype
                 createForm( name, type, sb, fieldPath + "." + name );

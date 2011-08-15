@@ -4,7 +4,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement( name = "stringholder" )
-public class StringDTO implements BaseDTO {
+public class StringDTO {
 
 	@XmlElement( name = "string" )
 	private String string;
