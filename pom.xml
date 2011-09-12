@@ -8,11 +8,11 @@
     <artifactId>restfuljersey</artifactId>
     <packaging>jar</packaging>
     <version>0.1-SNAPSHOT</version>
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-	<artifactId>oss-parent</artifactId>
-        <version>7</version>
-    </parent>
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
     <properties>
         <com.sun.jersey.version>1.8</com.sun.jersey.version>
     </properties>
@@ -24,24 +24,24 @@
 	<url>https://github.com/jayway/Restful-Jersey/tree/master</url>
     </scm>
 
-    <developers>
-        <developer>
-	    <id>mads</id>
-	    <name>Mads Enevoldsen</name>
-            <email>mads.enevoldsen at jayway.com</email>
-	    <organization>Jayway</organization>
-	    <organizationUrl>http://www.jayway.com</organizationUrl>
-	    <timezone>+1</timezone>
-        </developer>
-	<developer>
-            <id>ulsa</id>
-            <name>Ulrik Sandberg</name>
-            <organization>Jayway</organization>
-            <organizationUrl>http://www.jayway.com</organizationUrl>
-            <email>ulrik.sandberg at jayway.com</email>
-            <timezone>+1</timezone>
-        </developer>
-    </developers>
+	<developers>
+		<developer>
+			<id>mads</id>
+			<name>Mads Enevoldsen</name>
+			<email>mads.enevoldsen at jayway.com</email>
+			<organization>Jayway</organization>
+			<organizationUrl>http://www.jayway.com</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<id>ulsa</id>
+			<name>Ulrik Sandberg</name>
+			<organization>Jayway</organization>
+			<organizationUrl>http://www.jayway.com</organizationUrl>
+			<email>ulrik.sandberg at jayway.com</email>
+			<timezone>+1</timezone>
+		</developer>
+	</developers>
 
     <dependencies>
         <dependency>
@@ -99,20 +99,20 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <repositories>
+<!--    <repositories>
         <repository>
             <id>maven2-repository.dev.java.net</id>
             <name>Java.net Repository for Maven</name>
             <url>http://download.java.net/maven/2/</url>
             <layout>default</layout>
         </repository>
-    </repositories>
+    </repositories>-->
     <build>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
