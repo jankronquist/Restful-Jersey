@@ -2,7 +2,6 @@ package org.jersey.rest.resource;
 
 import com.sun.jersey.api.json.JSONJAXBContext;
 import com.sun.jersey.api.json.JSONUnmarshaller;
-import com.sun.xml.internal.bind.v2.runtime.JAXBContextImpl;
 import org.jersey.rest.RestfulJerseyService;
 import org.jersey.rest.constraint.Constraint;
 import org.jersey.rest.constraint.ConstraintEvaluator;
@@ -81,7 +80,7 @@ abstract public class Resource {
                     return new Object[]{ jsonUnmarshaller.unmarshalFromJSON( xml, dtoClass ) };
                 } else {
                     // default to xml
-                    JAXBContext context = JAXBContextImpl.newInstance(dto.newInstance().getClass());
+                    JAXBContext context = JAXBContext.newInstance(dto.newInstance().getClass());
                     return new Object[] { context.createUnmarshaller().unmarshal( xml ) };
                 }
             }

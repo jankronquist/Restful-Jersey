@@ -7,14 +7,43 @@
     <groupId>org.jersey.rest</groupId>
     <artifactId>restfuljersey</artifactId>
     <packaging>jar</packaging>
-    <version>0.1</version>
+    <version>0.1-SNAPSHOT</version>
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+	<artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
     <properties>
         <com.sun.jersey.version>1.8</com.sun.jersey.version>
     </properties>
+    <url>http://github.com/jayway/Restful-Jersey</url>
 
+    <scm>
+	<connection>scm:git:git://github.com/jayway/Restful-Jersey.git</connection>
+	<developerConnection>scm:git:ssh://git@github.com/jayway/Restful-Jersey.git</developerConnection>
+	<url>https://github.com/jayway/Restful-Jersey/tree/master</url>
+    </scm>
+
+    <developers>
+        <developer>
+	    <id>mads</id>
+	    <name>Mads Enevoldsen</name>
+            <email>mads.enevoldsen at jayway.com</email>
+	    <organization>Jayway</organization>
+	    <organizationUrl>http://www.jayway.com</organizationUrl>
+	    <timezone>+1</timezone>
+        </developer>
+	<developer>
+            <id>ulsa</id>
+            <name>Ulrik Sandberg</name>
+            <organization>Jayway</organization>
+            <organizationUrl>http://www.jayway.com</organizationUrl>
+            <email>ulrik.sandberg at jayway.com</email>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
 
     <dependencies>
-
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
