@@ -8,7 +8,7 @@ import com.jayway.jersey.rest.resource.Resource;
 
 /**
  */
-public class OtherResource extends Resource implements IdResource, IndexResource, DeletableResource {
+public class OtherResource implements IdResource, IndexResource, DeletableResource {
 
     @Override
     public Resource id(StringDTO id) {

@@ -8,7 +8,7 @@ package com.jayway.jersey.rest.resource;
  * if the capabilities html links to / and calls
  * it delete it will only re-discover...
  */
-public interface DeletableResource {
+public interface DeletableResource extends Resource {
 
     void delete();
 

@@ -11,7 +11,7 @@ import com.jayway.jersey.rest.dto.StringDTO;
  * to extend NamedResource.
  *
  */
-public interface IdResource {
+public interface IdResource extends Resource {
 
     Resource id( StringDTO id);
 

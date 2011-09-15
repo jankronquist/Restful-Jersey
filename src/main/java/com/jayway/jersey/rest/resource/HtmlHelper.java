@@ -12,12 +12,12 @@ import java.util.List;
  */
 public class HtmlHelper {
 
-    public void addResourceMethods( StringBuilder sb, List<Resource.ResourceMethod> methods ) {
+    public void addResourceMethods( StringBuilder sb, List<ResourceUtil.ResourceMethod> methods ) {
     	StringBuilder queries = new StringBuilder( );
     	StringBuilder commands = new StringBuilder( );
         StringBuilder subResources = new StringBuilder( );
     	
-    	for ( Resource.ResourceMethod method: methods ) {
+    	for ( ResourceUtil.ResourceMethod method: methods ) {
     		String path = method.name();
     		if ( method.isQuery() ) {
                 queries.append("<li><a href='").append(path).append("'>").append(path).append("</a></li>");

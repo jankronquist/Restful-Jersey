@@ -3,6 +3,7 @@ package com.jayway.jersey.rest;
 import com.jayway.jersey.rest.resource.ContextMap;
 import com.jayway.jersey.rest.resource.HtmlHelper;
 import com.jayway.jersey.rest.resource.Resource;
+import com.jayway.jersey.rest.resource.ResourceUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -65,7 +66,7 @@ public abstract class RestfulJerseyService {
     public Object capabilities() {
         setup();
         if ( uriInfo.getPath().endsWith( "/") )
-            return root().capabilities();
+            return ResourceUtil.capabilities(root());
         else throw new WebApplicationException( Response.Status.NOT_FOUND );
     }
 
@@ -123,9 +124,9 @@ public abstract class RestfulJerseyService {
     protected Object evaluateGet( String path ) {
         PathAndMethod pathAndMethod = new PathAndMethod( path );
         if ( pathAndMethod.method() == null ) {
-            return evaluatePath( pathAndMethod.pathSegments() ).capabilities();
+            return ResourceUtil.capabilities(evaluatePath( pathAndMethod.pathSegments()));
         }
-        return evaluatePath( pathAndMethod.pathSegments() ).get(pathAndMethod.method());
+        return ResourceUtil.get(evaluatePath( pathAndMethod.pathSegments()), pathAndMethod.method());
     }
 
     protected Response evaluatePostPut( String path, InputStream stream, MultivaluedMap<String, String> formParams ) {
@@ -133,7 +134,7 @@ public abstract class RestfulJerseyService {
         if ( pathAndMethod.method() == null ) {
             throw new WebApplicationException( HttpServletResponse.SC_METHOD_NOT_ALLOWED );
         }
-        return evaluatePath( pathAndMethod.pathSegments() ).post(pathAndMethod.method(), formParams, stream);
+        return ResourceUtil.post(evaluatePath( pathAndMethod.pathSegments()), pathAndMethod.method(), formParams, stream);
     }
 
     protected void evaluateDelete( String path ) {
@@ -141,13 +142,13 @@ public abstract class RestfulJerseyService {
         if ( pathAndMethod.method() != null ) {
             throw new WebApplicationException( HttpServletResponse.SC_METHOD_NOT_ALLOWED );
         }
-        evaluatePath( pathAndMethod.pathSegments() ).invokeDelete();
+        ResourceUtil.invokeDelete(evaluatePath( pathAndMethod.pathSegments()));
     }
 
     private Resource evaluatePath( List<String> segments ) {
         Resource current = root();
         for ( String pathSegment: segments ) {
-            current = current.invokePathMethod(pathSegment);
+            current = ResourceUtil.invokePathMethod(current, pathSegment);
         }
         return current;
     }

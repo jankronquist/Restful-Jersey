@@ -48,10 +48,10 @@ public class CapabilitiesTest extends AbstractRunner {
 
         webResource.path("test/").type(MediaType.TEXT_HTML).get(String.class);
 
-        ArrayList<Resource.ResourceMethod> list = (ArrayList<Resource.ResourceMethod>) StateHolder.get();
+        ArrayList<ResourceUtil.ResourceMethod> list = (ArrayList<ResourceUtil.ResourceMethod>) StateHolder.get();
 
         StringBuilder sb = new StringBuilder();
-        for ( Resource.ResourceMethod method : list ) {
+        for ( ResourceUtil.ResourceMethod method : list ) {
             sb.append( method.name() ).append( ":" ).append( method.type() ).append(",");
         }
         String result = sb.toString();

@@ -6,6 +6,6 @@ package com.jayway.jersey.rest.resource;
  * to automatically output the index result in the
  * capabilities of the resource
  */
-public interface IndexResource {
+public interface IndexResource extends Resource {
     Object index();
 }

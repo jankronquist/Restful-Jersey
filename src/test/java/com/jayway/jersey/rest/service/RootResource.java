@@ -6,7 +6,7 @@ import com.jayway.jersey.rest.resource.Resource;
 
 /**
  */
-public class RootResource extends Resource {
+public class RootResource implements Resource {
 
     public RootResource sub() {
         return new RootResource();
