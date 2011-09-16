@@ -35,34 +35,12 @@ public class CapabilitiesTest extends AbstractRunner {
 
     @Test
     public void discover() {
-        HtmlHelper mock = Mockito.mock(HtmlHelper.class);
-
-        Mockito.doAnswer( new Answer<Object>() {
-            public Object answer(InvocationOnMock invocation) {
-                StateHolder.set( invocation.getArguments()[1] );
-                return "invoked";
-            }
-        }).when( mock ).addResourceMethods( Mockito.any( StringBuilder.class), Mockito.anyList() );
-
-        StateHolder.set( mock );
-
-        webResource.path("test/").type(MediaType.TEXT_HTML).get(String.class);
-
-        ArrayList<ResourceUtil.ResourceMethod> list = (ArrayList<ResourceUtil.ResourceMethod>) StateHolder.get();
-
-        StringBuilder sb = new StringBuilder();
-        for ( ResourceUtil.ResourceMethod method : list ) {
-            sb.append( method.name() ).append( ":" ).append( method.type() ).append(",");
-        }
-        String result = sb.toString();
-        hasMethod(result, "command:COMMAND");
-        hasMethod(result, "sub:SUBRESOURCE");
-        hasMethod(result, "other:SUBRESOURCE" );
-        hasMethod(result, "addten:QUERY");
-        hasMethod(result, "echo:QUERY");
-        hasMethod(result, "wrong2:ILLEGAL");
-
-        Assert.assertEquals( "Must have 6 ResourceMethods", 6, list.size() );
+        String result = webResource.path("test/").type(MediaType.TEXT_HTML).get(String.class);
+        hasMethod(result, "command");
+        hasMethod(result, "sub");
+        hasMethod(result, "other" );
+        hasMethod(result, "addten");
+        hasMethod(result, "echo");
     }
 
     private void hasMethod( String result, String name ) {

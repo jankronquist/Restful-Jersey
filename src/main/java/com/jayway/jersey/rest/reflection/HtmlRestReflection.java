@@ -1,44 +1,62 @@
-package com.jayway.jersey.rest.resource;
-
-import com.jayway.jersey.rest.RestfulJerseyService;
+package com.jayway.jersey.rest.reflection;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.List;
 
-/**
- * Contains helper methods for producing html
- */
-public class HtmlHelper {
+import com.jayway.jersey.rest.RestfulJerseyService;
+import com.jayway.jersey.rest.resource.ResourceMethod;
 
-    public void addResourceMethods( StringBuilder sb, List<ResourceUtil.ResourceMethod> methods ) {
-    	StringBuilder queries = new StringBuilder( );
-    	StringBuilder commands = new StringBuilder( );
-        StringBuilder subResources = new StringBuilder( );
-    	
-    	for ( ResourceUtil.ResourceMethod method: methods ) {
-    		String path = method.name();
-    		if ( method.isQuery() ) {
-                queries.append("<li><a href='").append(path).append("'>").append(path).append("</a></li>");
-    		} else if ( method.isCommand() ) {
-    			commands.append("<li><a href='").append(path).append("'>").append(path).append("</a></li>");
-    		} else if ( method.isSubResource() ) {
-                subResources.append("<li><a href='").append(path).append( "/'>").append(path).append("</a></li>");
-    		}
-    	}
-    	appendListIfNotEmpty( sb, queries, "<h2>Queries</h2>" );
-    	appendListIfNotEmpty( sb, commands, "<h2>Commands</h2>" );
-    	appendListIfNotEmpty( sb, subResources, "<h2>Sub Resources</h2>" );
-    }
+public final class HtmlRestReflection implements RestReflection {
+	
+	public static final RestReflection INSTANCE = new HtmlRestReflection();
+	
+	private HtmlRestReflection() {
+	}
 
-    private void appendListIfNotEmpty( StringBuilder appendTo, StringBuilder list, String title ) {
-    	appendTo.append( title );
-    	if ( list.length() > 0 ) {
-    		appendTo.append( "<ul>" ).append( list ).append( "</ul>" ); 
-    	}
-    }
-    
+	@Override
+	public Object renderCapabilities(Capabilities capabilities) {
+        StringBuilder results = new StringBuilder( );
+        results.append("<h1>"+ capabilities.getName()  +"</h1>");
+        if (!capabilities.getQueries().isEmpty()) {
+            results.append("<h2>Queries</h2>");
+            results.append("<ul>");
+	    	for (ResourceMethod method: capabilities.getQueries()) {
+	    		String path = method.name();
+	            results.append("<li><a href='").append(path).append("'>").append(path).append("</a></li>");
+	    	}
+            results.append("</ul>");
+        }
+        if (!capabilities.getCommands().isEmpty()) {
+            results.append("<h2>Commands</h2>");
+            results.append("<ul>");
+	    	for (ResourceMethod method: capabilities.getCommands()) {
+	    		String path = method.name();
+	            results.append("<li><a href='").append(path).append("'>").append(path).append("</a></li>");
+	    	}
+            results.append("</ul>");
+        }
+        if (!capabilities.getResources().isEmpty()) {
+            results.append("<h2>Sub Resources</h2>");
+            results.append("<ul>");
+	    	for (String resource: capabilities.getResources()) {
+	            results.append("<li><a href='").append(resource).append("'>").append(resource).append("</a></li>");
+	    	}
+            results.append("</ul>");
+        }
+		return results.toString();
+	}
+
+	@Override
+	public Object renderCommandForm(Method method) {
+		return createForm(method, "POST");
+	}
+
+	@Override
+	public Object renderQueryForm(Method method) {
+		return createForm(method, "GET");
+	}
+
     /**
      * Generates an HTML form based on the method argument.
      * It will reflectively look at the argument for the method,

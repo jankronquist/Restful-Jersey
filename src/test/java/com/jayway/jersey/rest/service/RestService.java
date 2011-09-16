@@ -5,7 +5,6 @@ import javax.ws.rs.Path;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import com.jayway.jersey.rest.SpringRestfulJerseyService;
-import com.jayway.jersey.rest.resource.HtmlHelper;
 
 /**
  */
@@ -20,9 +19,6 @@ public class RestService extends SpringRestfulJerseyService {
 
     @Override
     protected void setupContext() {
-        if ( StateHolder.get() != null && StateHolder.get() instanceof HtmlHelper ) {
-            getContextMap().put( HtmlHelper.class, (HtmlHelper) StateHolder.get());
-        }
     }
 
 }

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import com.jayway.jersey.rest.reflection.RestReflection;
 import com.jayway.jersey.rest.resource.Resource;
 
 /**

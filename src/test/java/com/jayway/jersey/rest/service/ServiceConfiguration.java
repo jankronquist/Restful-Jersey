@@ -3,6 +3,8 @@ package com.jayway.jersey.rest.service;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.jayway.jersey.rest.reflection.HtmlRestReflection;
+import com.jayway.jersey.rest.reflection.RestReflection;
 import com.jayway.jersey.rest.resource.Resource;
 
 @Configuration

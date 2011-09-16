@@ -1,16 +1,39 @@
 package com.jayway.jersey.rest;
 
-import com.jayway.jersey.rest.resource.ContextMap;
-import com.jayway.jersey.rest.resource.HtmlHelper;
-import com.jayway.jersey.rest.resource.Resource;
-import com.jayway.jersey.rest.resource.ResourceUtil;
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.*;
-import javax.ws.rs.core.*;
-import java.io.InputStream;
-import java.util.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+
+import com.jayway.jersey.rest.reflection.Capabilities;
+import com.jayway.jersey.rest.reflection.HtmlRestReflection;
+import com.jayway.jersey.rest.reflection.RestReflection;
+import com.jayway.jersey.rest.resource.ContextMap;
+import com.jayway.jersey.rest.resource.IndexResource;
+import com.jayway.jersey.rest.resource.Resource;
+import com.jayway.jersey.rest.resource.ResourceMethod;
+import com.jayway.jersey.rest.resource.ResourceUtil;
 
 /**
  * Extend this class to define your rest
@@ -20,6 +43,20 @@ public abstract class RestfulJerseyService {
 
     protected abstract Resource root();
     protected abstract void setupContext();
+
+    private Map<String, RestReflection> reflectors = new HashMap<String, RestReflection>();
+    
+    public void registerRestReflection(String contentType, RestReflection restReflection) {
+    	reflectors.put(contentType, restReflection);
+    }
+    
+    private RestReflection restReflection(String contentType) {
+		RestReflection restReflection = reflectors.get(contentType);
+		if (restReflection == null) {
+			return HtmlRestReflection.INSTANCE;
+		}
+		return restReflection;
+	}
 
     /**
      * Override this method to initialize resources, for example using dependency injection.
@@ -43,10 +80,10 @@ public abstract class RestfulJerseyService {
     @Context private HttpServletRequest request;
 
 
-    public static Set<Class> basicTypes;
+    public static Set<Class<?>> basicTypes;
 
     static {
-        basicTypes = new HashSet<Class>();
+        basicTypes = new HashSet<Class<?>>();
         basicTypes.add( String.class);
         basicTypes.add( Integer.class);
         basicTypes.add( Double.class );
@@ -60,7 +97,6 @@ public abstract class RestfulJerseyService {
         contextMap.put( HttpServletResponse.class, response );
         contextMap.put( HttpServletRequest.class, request );
         contextMap.put( UriInfo.class, uriInfo );
-        contextMap.put( HtmlHelper.class, new HtmlHelper() );
         setContextMap(contextMap);
 
         // call application specific context setup
@@ -72,9 +108,9 @@ public abstract class RestfulJerseyService {
     @Consumes( "text/html;charset=utf-8" )
     public Object capabilities() {
         setup();
-        if ( uriInfo.getPath().endsWith( "/") )
-            return ResourceUtil.capabilities(root());
-        else throw new WebApplicationException( Response.Status.NOT_FOUND );
+        if ( uriInfo.getPath().endsWith( "/") ) {
+            return capabilities(root());
+        } else throw new WebApplicationException( Response.Status.NOT_FOUND );
     }
 
     @GET
@@ -131,9 +167,9 @@ public abstract class RestfulJerseyService {
     protected Object evaluateGet( String path ) {
         PathAndMethod pathAndMethod = new PathAndMethod( path );
         if ( pathAndMethod.method() == null ) {
-            return ResourceUtil.capabilities(evaluatePath( pathAndMethod.pathSegments()));
+            return capabilities(evaluatePath( pathAndMethod.pathSegments()));
         }
-        return ResourceUtil.get(evaluatePath( pathAndMethod.pathSegments()), pathAndMethod.method());
+        return get(evaluatePath( pathAndMethod.pathSegments()), pathAndMethod.method());
     }
 
     protected Response evaluatePostPut( String path, InputStream stream, MultivaluedMap<String, String> formParams ) {
@@ -197,4 +233,69 @@ public abstract class RestfulJerseyService {
             return method;
         }
     }
+
+	public Object get(Object resource, String get ) {
+	    ResourceMethod m = ResourceUtil.findMethod(resource, get);
+	    if ( m.isSubResource() ) {
+	        throw new WebApplicationException( Response.Status.NOT_FOUND );
+	    }
+	
+	    if ( m.isCommand() ) {
+	        Response response = Response.status( HttpServletResponse.SC_METHOD_NOT_ALLOWED).entity( restReflection(request.getContentType()).renderCommandForm( m.getMethod()) ).build();
+	        throw new WebApplicationException( response );
+	    }
+	
+	    MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
+	    if ( queryParams.size() == 0 && m.getMethod().getParameterTypes().length > 0) {
+	        return restReflection(request.getContentType()).renderQueryForm(m.getMethod());
+	    } else {
+	        try {
+	            Object result;
+	            if ( m.getMethod().getParameterTypes().length == 1) {
+	                Class<?> dto = m.getMethod().getParameterTypes()[0];
+	                result = m.getMethod().invoke(resource, ResourceUtil.populateDTO( dto, queryParams, dto.getSimpleName() ) );
+	            } else {
+	                result = m.getMethod().invoke(resource);
+	            }
+	            if ( request.getHeader("Accept").contains(MediaType.TEXT_HTML) ) {
+	                return result.toString();
+	            }
+	            return result;
+	        } catch ( IllegalAccessException e) {
+	            throw new WebApplicationException( e, Response.Status.INTERNAL_SERVER_ERROR );
+	        } catch ( InvocationTargetException e) {
+	            throw new WebApplicationException( e, Response.Status.INTERNAL_SERVER_ERROR );
+	        }
+	    }
+	}
+
+	/**
+	 * lists the capabilities of this resource.
+	 */
+	private Object capabilities(Object resource) {
+	    Class<?> clazz = resource.getClass();
+		Capabilities capabilities = new Capabilities(clazz.getName());
+	    for ( Method m : clazz.getDeclaredMethods() ) {
+	        if ( m.isSynthetic() ) continue;
+	    	ResourceMethod method = ResourceMethod.make(m);
+	    	if (method != null) {
+		    	switch (method.type()) {
+		    	case COMMAND:
+		    		capabilities.addCommand(method);
+		    		break;
+		    	case QUERY:
+		    		capabilities.addQuery(method);
+		    		break;
+		    	case SUBRESOURCE:
+		    		capabilities.addResource(method.name());
+		    		break;
+		    	}
+	    	}
+	    }
+	    if (resource instanceof IndexResource ) {
+	    	capabilities.setIndex(((IndexResource) resource).index());
+	    }
+	    return restReflection(request.getContentType()).renderCapabilities(capabilities);
+	}
+
 }
