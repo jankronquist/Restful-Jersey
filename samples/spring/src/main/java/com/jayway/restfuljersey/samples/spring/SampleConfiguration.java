@@ -17,4 +17,9 @@ public class SampleConfiguration {
 	public Resource root() {
 		return new RootResource();
 	}
+	
+	@Bean
+	public Object service() {
+		return new SampleService(); 
+	}
 }

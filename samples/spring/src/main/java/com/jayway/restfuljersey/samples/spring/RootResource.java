@@ -6,4 +6,7 @@ public class RootResource implements Resource {
 	public void doStuff() {
 		System.out.println("DO STUFF!!!");
 	}
+	public SubResource sub() {
+		return new SubResource();
+	}
 }
