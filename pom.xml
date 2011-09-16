@@ -13,8 +13,12 @@
 		<version>7</version>
 	</parent>
 	<url>http://github.com/jayway/Restful-Jersey</url>
+	<properties>
+		<com.sun.jersey.version>1.8</com.sun.jersey.version>
+	</properties>
 	<modules>
 	  <module>core</module>
+	  <module>samples</module>
 	</modules>
 
 	<scm>

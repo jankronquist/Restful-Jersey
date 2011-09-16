@@ -11,9 +11,6 @@
 		<artifactId>restfuljersey-root</artifactId>
   	<version>0.2.0-SNAPSHOT</version>
 	</parent>
-	<properties>
-		<com.sun.jersey.version>1.8</com.sun.jersey.version>
-	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework</groupId>
