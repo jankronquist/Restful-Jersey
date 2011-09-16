@@ -8,11 +8,6 @@ import com.jayway.jersey.rest.resource.Resource;
 @Configuration
 public class SampleConfiguration {
 	
-	public SampleConfiguration() {
-		System.out.println(">>>>>>>>>>>>>>>>>>>>");
-		System.out.println("Hello from sample config!!!");
-	}
-
 	@Bean
 	public Resource root() {
 		return new RootResource();
