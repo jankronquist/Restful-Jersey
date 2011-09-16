@@ -40,7 +40,7 @@ public final class HtmlRestReflection implements RestReflection {
             results.append("<h2>Sub Resources</h2>");
             results.append("<ul>");
 	    	for (String resource: capabilities.getResources()) {
-	            results.append("<li><a href='").append(resource).append("'>").append(resource).append("</a></li>");
+	            results.append("<li><a href='").append(resource).append("/'>").append(resource).append("</a></li>");
 	    	}
             results.append("</ul>");
         }

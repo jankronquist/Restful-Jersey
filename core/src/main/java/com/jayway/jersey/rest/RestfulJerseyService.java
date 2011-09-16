@@ -28,12 +28,14 @@ import javax.ws.rs.core.UriInfo;
 
 import com.jayway.jersey.rest.reflection.Capabilities;
 import com.jayway.jersey.rest.reflection.HtmlRestReflection;
+import com.jayway.jersey.rest.reflection.JsonRestReflection;
 import com.jayway.jersey.rest.reflection.RestReflection;
 import com.jayway.jersey.rest.resource.ContextMap;
 import com.jayway.jersey.rest.resource.IndexResource;
 import com.jayway.jersey.rest.resource.Resource;
 import com.jayway.jersey.rest.resource.ResourceMethod;
 import com.jayway.jersey.rest.resource.ResourceUtil;
+import com.sun.jersey.api.core.HttpContext;
 
 /**
  * Extend this class to define your rest
@@ -44,18 +46,26 @@ public abstract class RestfulJerseyService {
     protected abstract Resource root();
     protected abstract void setupContext();
 
-    private Map<String, RestReflection> reflectors = new HashMap<String, RestReflection>();
+    private Map<MediaType, RestReflection> reflectors = new HashMap<MediaType, RestReflection>();
     
-    public void registerRestReflection(String contentType, RestReflection restReflection) {
-    	reflectors.put(contentType, restReflection);
+    public RestfulJerseyService() {
+    	reflectors.put(MediaType.APPLICATION_JSON_TYPE, JsonRestReflection.INSTANCE);
+    	reflectors.put(MediaType.TEXT_HTML_TYPE, HtmlRestReflection.INSTANCE);
+	}
+    
+    public void registerRestReflection(MediaType mediaType, RestReflection restReflection) {
+    	reflectors.put(mediaType, restReflection);
     }
     
-    private RestReflection restReflection(String contentType) {
-		RestReflection restReflection = reflectors.get(contentType);
-		if (restReflection == null) {
-			return HtmlRestReflection.INSTANCE;
+    private RestReflection restReflection() {
+    	List<MediaType> mediaTypes = context.getRequest().getAcceptableMediaTypes();
+    	for (MediaType mediaType : mediaTypes) {
+    		RestReflection restReflection = reflectors.get(mediaType);
+    		if (restReflection != null) {
+        		return restReflection;
+    		}
 		}
-		return restReflection;
+		throw new WebApplicationException(Response.Status.UNSUPPORTED_MEDIA_TYPE);
 	}
 
     /**
@@ -78,6 +88,7 @@ public abstract class RestfulJerseyService {
     @Context private UriInfo uriInfo;
     @Context private HttpServletResponse response;
     @Context private HttpServletRequest request;
+    @Context private HttpContext context;
 
 
     public static Set<Class<?>> basicTypes;
@@ -241,13 +252,13 @@ public abstract class RestfulJerseyService {
 	    }
 	
 	    if ( m.isCommand() ) {
-	        Response response = Response.status( HttpServletResponse.SC_METHOD_NOT_ALLOWED).entity( restReflection(request.getContentType()).renderCommandForm( m.getMethod()) ).build();
+	        Response response = Response.status( HttpServletResponse.SC_METHOD_NOT_ALLOWED).entity( restReflection().renderCommandForm( m.getMethod()) ).build();
 	        throw new WebApplicationException( response );
 	    }
 	
 	    MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
 	    if ( queryParams.size() == 0 && m.getMethod().getParameterTypes().length > 0) {
-	        return restReflection(request.getContentType()).renderQueryForm(m.getMethod());
+	        return restReflection().renderQueryForm(m.getMethod());
 	    } else {
 	        try {
 	            Object result;
@@ -295,7 +306,7 @@ public abstract class RestfulJerseyService {
 	    if (resource instanceof IndexResource ) {
 	    	capabilities.setIndex(((IndexResource) resource).index());
 	    }
-	    return restReflection(request.getContentType()).renderCapabilities(capabilities);
+	    return restReflection().renderCapabilities(capabilities);
 	}
 
 }
