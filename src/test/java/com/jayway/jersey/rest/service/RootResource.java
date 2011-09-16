@@ -32,4 +32,9 @@ public class RootResource implements Resource {
     public void wrong2( StringDTO one, StringDTO two ) {
         
     }
+
+    public PersonsResource persons() {
+    	System.out.println("RootResource!!!");
+        return new PersonsResource();
+    }
 }
