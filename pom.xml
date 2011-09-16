@@ -4,18 +4,18 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.jayway.restfuljersey</groupId>
-	<artifactId>restfuljersey</artifactId>
-	<packaging>jar</packaging>
+	<artifactId>restfuljersey-root</artifactId>
+	<packaging>pom</packaging>
 	<version>0.2.0-SNAPSHOT</version>
 	<parent>
 		<groupId>org.sonatype.oss</groupId>
 		<artifactId>oss-parent</artifactId>
 		<version>7</version>
 	</parent>
-	<properties>
-		<com.sun.jersey.version>1.8</com.sun.jersey.version>
-	</properties>
 	<url>http://github.com/jayway/Restful-Jersey</url>
+	<modules>
+	  <module>core</module>
+	</modules>
 
 	<scm>
 		<connection>scm:git:git://github.com/jayway/Restful-Jersey.git</connection>
@@ -49,80 +49,6 @@
 			<timezone>+1</timezone>
 		</developer>
 	</developers>
-	<dependencies>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-beans</artifactId>
-			<version>3.0.5.RELEASE</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-			<version>3.0.5.RELEASE</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-server</artifactId>
-			<version>${com.sun.jersey.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-json</artifactId>
-			<version>${com.sun.jersey.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-client</artifactId>
-			<version>${com.sun.jersey.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>4.1-alpha1</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.5</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-		<!-- Test dependencies -->
-		<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-		<dependency>
-			<groupId>cglib</groupId>
-			<artifactId>cglib-nodep</artifactId>
-			<version>2.2</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.8.1</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
-			<version>1.8.4</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>1.4</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.jersey.test.framework</groupId>
-			<artifactId>jersey-test-framework</artifactId>
-			<version>1.0.3</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
