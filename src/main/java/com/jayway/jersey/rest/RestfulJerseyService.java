@@ -21,6 +21,13 @@ public abstract class RestfulJerseyService {
     protected abstract Resource root();
     protected abstract void setupContext();
 
+    /**
+     * Override this method to initialize resources, for example using dependency injection.
+     */
+    protected Resource postCreate(Resource resource) {
+    	return resource;
+	}
+
     private static ThreadLocal<ContextMap> currentMap = new ThreadLocal<ContextMap>();
 
     protected static void setContextMap( ContextMap map) {
@@ -149,11 +156,12 @@ public abstract class RestfulJerseyService {
         Resource current = root();
         for ( String pathSegment: segments ) {
             current = ResourceUtil.invokePathMethod(current, pathSegment);
+            postCreate(current);
         }
         return current;
     }
 
-    class PathAndMethod {
+	class PathAndMethod {
         private List<String> pathSegments;
         private String method;
 
