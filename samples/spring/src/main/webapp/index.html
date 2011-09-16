@@ -1,0 +1,37 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml">
+<head>
+	<title>demo</title>
+
+    <script type="text/javascript" src="lib/jquery-1.6.4.min.js"></script>
+    <script type="text/javascript" src="js/ajax.js"></script>
+    <script type="text/javascript" src="js/rest.js"></script>
+</head>
+<body>
+    <script>
+    	var _root = null;
+	    $(document).ready(function(){
+	    	demo.rest.init("api/root/", function(root) {
+	    		_root = root;
+ 	    	});
+		    $('#test-button').click(function(){
+		    	_root.sub(function(sub) {
+		    		sub.sayHello({"StringDTO.string": "world"}, function() {
+		    			
+		    		});
+		    	});
+	            return false;
+	        });
+		    $('#command-button').click(function(){
+		    	_root.doStuff(function() {
+		    		alert("Command completed!");
+		    	});
+	            return false;
+	        });
+	    });
+
+    </script>
+	<button id="test-button" type="button">Click me</button>
+	<button id="command-button" type="button">Command</button>
+</body>
+</html>

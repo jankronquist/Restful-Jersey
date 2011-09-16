@@ -1,11 +1,6 @@
 package com.jayway.jersey.rest.reflection;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-
-import com.jayway.jersey.rest.RestfulJerseyService;
-import com.jayway.jersey.rest.resource.ResourceMethod;
+import java.util.List;
 
 public final class HtmlRestReflection implements RestReflection {
 	
@@ -21,7 +16,7 @@ public final class HtmlRestReflection implements RestReflection {
         if (!capabilities.getQueries().isEmpty()) {
             results.append("<h2>Queries</h2>");
             results.append("<ul>");
-	    	for (ResourceMethod method: capabilities.getQueries()) {
+	    	for (Capability method: capabilities.getQueries()) {
 	    		String path = method.name();
 	            results.append("<li><a href='").append(path).append("'>").append(path).append("</a></li>");
 	    	}
@@ -30,7 +25,7 @@ public final class HtmlRestReflection implements RestReflection {
         if (!capabilities.getCommands().isEmpty()) {
             results.append("<h2>Commands</h2>");
             results.append("<ul>");
-	    	for (ResourceMethod method: capabilities.getCommands()) {
+	    	for (Capability method: capabilities.getCommands()) {
 	    		String path = method.name();
 	            results.append("<li><a href='").append(path).append("'>").append(path).append("</a></li>");
 	    	}
@@ -48,13 +43,13 @@ public final class HtmlRestReflection implements RestReflection {
 	}
 
 	@Override
-	public Object renderCommandForm(Method method) {
-		return createForm(method, "POST");
+	public Object renderCommandForm(Capability capability) {
+		return createForm(capability, "POST");
 	}
 
 	@Override
-	public Object renderQueryForm(Method method) {
-		return createForm(method, "GET");
+	public Object renderQueryForm(Capability capability) {
+		return createForm(capability, "GET");
 	}
 
     /**
@@ -66,41 +61,36 @@ public final class HtmlRestReflection implements RestReflection {
      * @param method
      * @return html form getting the parameters needed for the method
      */
-    protected String createForm( Method method, String httpMethod ) {
-        Class<?>[] types = method.getParameterTypes();
+    protected String createForm( Capability capability, String httpMethod ) {
+        List<Parameter> parameters = capability.getParameters();
         StringBuilder sb = new StringBuilder();
-        sb.append( "<form name='generatedform' action='").append(method.getName()).
+        sb.append( "<form name='generatedform' action='").append(capability.name()).
                 append("' method='").append(httpMethod).append("' >" );
 
-        for ( Class<?> type : types ) {
-            createForm( type.getSimpleName(), type, sb, type.getSimpleName() );
+        for ( Parameter parameter : parameters ) {
+            createForm( parameter, sb, parameter.getPath());
         }
         return sb.append( "<input type='submit' /></form>" ).toString();
     }
 
-    private static void createForm( String legend, Class<?> dto, StringBuilder sb, String fieldPath ) {
-        sb.append("<fieldset><legend>").append(legend).append("</legend>");
-        for ( Field f : dto.getDeclaredFields() ) {
-            if ( Modifier.isFinal(f.getModifiers())) continue;
-            String name = f.getName();
-            Class<?> type = f.getType();
-            // this must be one of the getters
-            if (RestfulJerseyService.basicTypes.contains(  type ) ) {
-                sb.append(name).append(": <input type='").
-                        append( name.equals("password")? "password": "text" ).
-                        append("' name='").append( fieldPath ).append( "." ).append( name).append("'/></br>");
-            } else if ( type.isEnum() ) {
-                sb.append(name).append( ": <select name='").append( fieldPath ).append( "." ).append(name).append("'>");
-                for ( Object o : type.getEnumConstants() ) {
-                    sb.append( "<option value='").append(o).append("'>").append(o).append("</option>");
-                }
-                sb.append("</select></br>");
-            } else {
-                // for now assume DTO subtype
-                createForm( name, type, sb, fieldPath + "." + name );
+    private static void createForm( Parameter parameter, StringBuilder sb, String fieldPath ) {
+        if (parameter.isTextField()) {
+            sb.append(parameter.getName()).append(": <input type='").
+                    append( parameter.isPassword() ? "password": "text" ).
+                    append("' name='").append( fieldPath ).append("'/></br>");
+        } else if ( parameter.hasOptions() ) {
+            sb.append(parameter.getName()).append( ": <select name='").append( fieldPath ).append("'>");
+            for ( Object o : parameter.getOptions() ) {
+                sb.append( "<option value='").append(o).append("'>").append(o).append("</option>");
             }
+            sb.append("</select></br>");
+        } else {
+            sb.append("<fieldset><legend>").append(parameter.getName()).append("</legend>");
+            for ( Parameter child : parameter.getChildParameters() ) {
+            	createForm(child, sb, fieldPath + "." + child.getPath());
+            }
+            sb.append("</fieldset>");
         }
-        sb.append("</fieldset>");
     }
 
 }

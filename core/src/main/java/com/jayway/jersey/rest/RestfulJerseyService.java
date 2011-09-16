@@ -27,13 +27,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import com.jayway.jersey.rest.reflection.Capabilities;
+import com.jayway.jersey.rest.reflection.Capability;
 import com.jayway.jersey.rest.reflection.HtmlRestReflection;
 import com.jayway.jersey.rest.reflection.JsonRestReflection;
 import com.jayway.jersey.rest.reflection.RestReflection;
 import com.jayway.jersey.rest.resource.ContextMap;
 import com.jayway.jersey.rest.resource.IndexResource;
 import com.jayway.jersey.rest.resource.Resource;
-import com.jayway.jersey.rest.resource.ResourceMethod;
 import com.jayway.jersey.rest.resource.ResourceUtil;
 import com.sun.jersey.api.core.HttpContext;
 
@@ -65,6 +65,7 @@ public abstract class RestfulJerseyService {
         		return restReflection;
     		}
 		}
+    	System.out.println("mediaTypes: " + mediaTypes);
 		throw new WebApplicationException(Response.Status.UNSUPPORTED_MEDIA_TYPE);
 	}
 
@@ -115,8 +116,6 @@ public abstract class RestfulJerseyService {
     }
 
     @GET
-    @Produces( "text/html;charset=utf-8" )
-    @Consumes( "text/html;charset=utf-8" )
     public Object capabilities() {
         setup();
         if ( uriInfo.getPath().endsWith( "/") ) {
@@ -188,7 +187,7 @@ public abstract class RestfulJerseyService {
         if ( pathAndMethod.method() == null ) {
             throw new WebApplicationException( HttpServletResponse.SC_METHOD_NOT_ALLOWED );
         }
-        return ResourceUtil.post(evaluatePath( pathAndMethod.pathSegments()), pathAndMethod.method(), formParams, stream);
+        return post(evaluatePath( pathAndMethod.pathSegments()), pathAndMethod.method(), formParams, stream);
     }
 
     protected void evaluateDelete( String path ) {
@@ -246,28 +245,22 @@ public abstract class RestfulJerseyService {
     }
 
 	public Object get(Object resource, String get ) {
-	    ResourceMethod m = ResourceUtil.findMethod(resource, get);
+	    Capability m = ResourceUtil.findMethod(resource, get);
 	    if ( m.isSubResource() ) {
 	        throw new WebApplicationException( Response.Status.NOT_FOUND );
 	    }
 	
 	    if ( m.isCommand() ) {
-	        Response response = Response.status( HttpServletResponse.SC_METHOD_NOT_ALLOWED).entity( restReflection().renderCommandForm( m.getMethod()) ).build();
+	        Response response = Response.status( HttpServletResponse.SC_METHOD_NOT_ALLOWED).entity( restReflection().renderCommandForm( m) ).build();
 	        throw new WebApplicationException( response );
 	    }
 	
 	    MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
-	    if ( queryParams.size() == 0 && m.getMethod().getParameterTypes().length > 0) {
-	        return restReflection().renderQueryForm(m.getMethod());
+	    if ( queryParams.size() == 0 && m.getParameterCount() > 0) {
+	        return restReflection().renderQueryForm(m);
 	    } else {
 	        try {
-	            Object result;
-	            if ( m.getMethod().getParameterTypes().length == 1) {
-	                Class<?> dto = m.getMethod().getParameterTypes()[0];
-	                result = m.getMethod().invoke(resource, ResourceUtil.populateDTO( dto, queryParams, dto.getSimpleName() ) );
-	            } else {
-	                result = m.getMethod().invoke(resource);
-	            }
+	            Object result = m.get(resource, queryParams);
 	            if ( request.getHeader("Accept").contains(MediaType.TEXT_HTML) ) {
 	                return result.toString();
 	            }
@@ -288,7 +281,7 @@ public abstract class RestfulJerseyService {
 		Capabilities capabilities = new Capabilities(clazz.getName());
 	    for ( Method m : clazz.getDeclaredMethods() ) {
 	        if ( m.isSynthetic() ) continue;
-	    	ResourceMethod method = ResourceMethod.make(m);
+	    	Capability method = Capability.make(m);
 	    	if (method != null) {
 		    	switch (method.type()) {
 		    	case COMMAND:
@@ -309,4 +302,22 @@ public abstract class RestfulJerseyService {
 	    return restReflection().renderCapabilities(capabilities);
 	}
 
+	private Response post(Object resource, String method, MultivaluedMap<String,String> formParams, InputStream stream) {
+	    Capability m = ResourceUtil.findMethod(resource, method);
+	    if ( !m.isCommand() ) throw new WebApplicationException( HttpServletResponse.SC_NOT_FOUND );
+	    try {
+		    m.post(resource, request.getContentType(), formParams, stream);
+	        return successResponse();
+	    } catch (InvocationTargetException e) {
+	        if ( e.getCause() instanceof WebApplicationException ) throw (WebApplicationException) e.getCause();
+	        throw new WebApplicationException( e.getCause(), Response.Status.BAD_REQUEST );
+	    } catch (IllegalAccessException e) {
+	        e.printStackTrace();
+	        throw new WebApplicationException( e.getCause(), Response.Status.INTERNAL_SERVER_ERROR );
+	    }
+	}
+	
+	private static Response successResponse() {
+	    return Response.ok().status(200).build();
+	}
 }

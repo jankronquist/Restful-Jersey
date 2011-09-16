@@ -3,12 +3,11 @@ package com.jayway.jersey.rest.reflection;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.jayway.jersey.rest.resource.ResourceMethod;
 
 public class Capabilities {
 	private final String name;
-	private final List<ResourceMethod> queries = new LinkedList<ResourceMethod>();
-	private final List<ResourceMethod> commands = new LinkedList<ResourceMethod>();
+	private final List<Capability> queries = new LinkedList<Capability>();
+	private final List<Capability> commands = new LinkedList<Capability>();
 	private final List<String> resources = new LinkedList<String>();
 	private Object index;
 	public void setIndex(Object index) {
@@ -17,10 +16,10 @@ public class Capabilities {
 	public Capabilities(String name) {
 		this.name = name;
 	}
-	public void addQuery(ResourceMethod method) {
+	public void addQuery(Capability method) {
 		queries.add(method);
 	}
-	public void addCommand(ResourceMethod method) {
+	public void addCommand(Capability method) {
 		commands.add(method);
 	}
 	public void addResource(String resource) {
@@ -29,10 +28,10 @@ public class Capabilities {
 	public String getName() {
 		return name;
 	}
-	public List<ResourceMethod> getQueries() {
+	public List<Capability> getQueries() {
 		return queries;
 	}
-	public List<ResourceMethod> getCommands() {
+	public List<Capability> getCommands() {
 		return commands;
 	}
 	public List<String> getResources() {
