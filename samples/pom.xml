@@ -12,5 +12,6 @@
 	</parent>
   <modules>
     <module>spring</module>
+    <module>bank</module>
   </modules>
 </project>
