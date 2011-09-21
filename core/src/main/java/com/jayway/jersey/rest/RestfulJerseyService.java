@@ -65,7 +65,7 @@ public abstract class RestfulJerseyService {
         		return restReflection;
     		}
 		}
-    	System.out.println("mediaTypes: " + mediaTypes);
+//    	System.out.println("mediaTypes: " + mediaTypes);
 		throw new WebApplicationException(Response.Status.UNSUPPORTED_MEDIA_TYPE);
 	}
 
